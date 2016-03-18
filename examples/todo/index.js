@@ -16,4 +16,4 @@ todos.get('/todos', function(req, res) {
   res.done('Hello, world!');
 });
 
-app.ready();
+app.launch();
