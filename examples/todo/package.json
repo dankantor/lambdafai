@@ -1,0 +1,13 @@
+{
+  "name": "todo-example",
+  "version": "0.0.1",
+  "description": "TODO",
+  "author": "Clarifai, Inc.",
+  "license": "none",
+  "devDependencies": {
+    "gulp": "^3.9.0"
+  },
+  "dependencies": {
+    "lambdafai": "../.."
+  }
+}
