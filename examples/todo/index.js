@@ -8,7 +8,7 @@ lambdafai('todo-example', function(app) {
   app.bucket({ name: 'attachments' });
 
   // Define Lambdas:
-  var todos = app.lambda({ name: 'todos', ram: 512 })
+  var todos = app.lambda({ name: 'todos', ram: 512 });
 
   // Implement endpoints:
   todos.get('/todos', function(req, res) {
