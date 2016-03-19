@@ -5,10 +5,13 @@
   "main": "lib/index.js",
   "author": "Clarifai, Inc.",
   "license": "none",
+  "scripts": {
+    "test": "./node_modules/mocha/bin/mocha -R spec --recursive"
+  },
   "devDependencies": {
-    "gulp": "^3.9.0",
+    "chai": "3.5.0",
     "nock": "^4.0.0",
-    "tasks": "file:../../tasks"
+    "mocha": "2.4.5"
   },
   "dependencies": {
     "argparse": "^1.0.6",
