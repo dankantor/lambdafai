@@ -133,7 +133,7 @@ describe('#handler', function() {
     app.use(function(req, res) {
       expect(res.isDone).to.equal(false);
       req.appMiddlewareParam = 1;
-      res.pass();
+      res.next();
     });
 
     var lambda = app.lambda({ name: 'my-lambda' });
@@ -142,7 +142,7 @@ describe('#handler', function() {
     lambda.use(function(req, res) {
       expect(res.isDone).to.equal(false);
       req.lambdaMiddlewareParam = req.appMiddlewareParam + 1;
-      res.pass();
+      res.next();
     });
 
     lambda.get('/hello', function(req, res) {
@@ -153,14 +153,14 @@ describe('#handler', function() {
     lambda.use(function(req, res) {
       expect(res.isDone).to.equal(true);
       res.payload.push(3);
-      res.pass();
+      res.next();
     });
 
     // Add a middleware that executes on the app after the handler.
     app.use(function(req, res) {
       expect(res.isDone).to.equal(true);
       res.payload.push(4);
-      res.pass();
+      res.next();
     });
 
     var event = { method: 'GET', path: '/hello' };
