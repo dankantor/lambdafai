@@ -12,10 +12,10 @@ lambdafai('todo-example', function(app) {
 
   // Implement endpoints:
   todos.get('/todos', function(req, res) {
-    res.done(null, req);  // Echo back the request.
+    res.done(null, 'Hello, world!');
   });
 
   todos.get('/todos/:id', function(req, res) {
-    res.done(null, req);  // Echo back the request.
+    res.done(null, 'Hello, world!');
   });
 });

@@ -106,11 +106,11 @@ describe('#handler', function() {
     var app = new App('test-app');
     var lambda = app.lambda({ name: 'my-lambda' });
 
-    lambda.get('/hello/:id', function(req, res) {});
+    lambda.get('/hello', function(req, res) {});
 
     var event = {
       method: 'GET',
-      path: '/hello/id',
+      path: '/hello/world',
       headers: '{Content-Type=application/javascript, Accept=*/*, text/*}',
       headerNames: '[Content-Type, Accept]',
     };
