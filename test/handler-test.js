@@ -106,7 +106,7 @@ describe('#handler', function() {
     var app = new App('test-app');
     var lambda = app.lambda({ name: 'my-lambda' });
 
-    lambda.get('/hello', function(req, res) {});
+    lambda.get('/hello', function(req, res) { res.done(null, {}); });
 
     var event = {
       method: 'GET',
@@ -125,4 +125,54 @@ describe('#handler', function() {
 
     handler(app, event, context);
   });
+
+  it('executes middleware', function(testDone) {
+    var app = new App('test-app');
+
+    // Add a middleware the executes on the app before the handler:
+    app.use(function(req, res) {
+      expect(res.isDone).to.equal(false);
+      req.appMiddlewareParam = 1;
+      res.next();
+    });
+
+    var lambda = app.lambda({ name: 'my-lambda' });
+
+    // Add a middleware that executes on the Lambda before the handler:
+    lambda.use(function(req, res) {
+      expect(res.isDone).to.equal(false);
+      req.lambdaMiddlewareParam = req.appMiddlewareParam + 1;
+      res.next();
+    });
+
+    lambda.get('/hello', function(req, res) {
+      res.done(null, [ req.appMiddlewareParam, req.lambdaMiddlewareParam ]);
+    });
+
+    // Add a middleware that executes on the Lambda after the handler.
+    lambda.use(function(req, res) {
+      expect(res.isDone).to.equal(true);
+      res.payload.push(3);
+      res.next();
+    });
+
+    // Add a middleware that executes on the app after the handler.
+    app.use(function(req, res) {
+      expect(res.isDone).to.equal(true);
+      res.payload.push(4);
+      res.next();
+    });
+
+    var event = { method: 'GET', path: '/hello' };
+    var context = {
+      done: function(err, data) {
+        expect(err).to.be.null;
+        expect(data).to.deep.equal([ 1, 2, 3, 4 ]);
+        testDone();
+      }
+    };
+
+    handler(app, event, context);
+  });
+
 });
