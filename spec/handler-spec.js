@@ -1,6 +1,6 @@
-var expect = require('chai').expect;
 var handler = require('../lib/handler');
 var App = require('../lib/api/app');
+
 
 describe('#handler', function() {
   it('invokes lambda with request', function(testDone) {
@@ -8,15 +8,15 @@ describe('#handler', function() {
     var lambda = app.lambda({ name: 'my-lambda' });
 
     lambda.get('/hello/world', function(req, res) {
-      expect(req.method).to.equal('GET');
-      expect(req.path).to.equal('/hello/world');
-      expect(req.headers).to.deep.equal({
+      expect(req.method).toEqual('GET');
+      expect(req.path).toEqual('/hello/world');
+      expect(req.headers).toEqual({
         'Content-Type': 'application/javascript',
         'Accept': '*/*, text/*'
       });
-      expect(req.params).to.deep.equal({});
-      expect(req.query).to.deep.equal({foo: 'bar'});
-      expect(req.body).to.deep.equal({ size: 'large' });
+      expect(req.params).toEqual({});
+      expect(req.query).toEqual({foo: 'bar'});
+      expect(req.body).toEqual({ size: 'large' });
       res.done(null, { x: 123 });
     });
 
@@ -36,8 +36,8 @@ describe('#handler', function() {
 
     var context = {
       done: function(err, data) {
-        expect(err).to.be.null;
-        expect(data).to.deep.equal({ x: 123 });
+        expect(err).toBeNull();
+        expect(data).toEqual({ x: 123 });
         testDone();
       }
     };
@@ -50,8 +50,8 @@ describe('#handler', function() {
     var lambda = app.lambda({ name: 'my-lambda' });
 
     lambda.get('/hello/:id', function(req, res) {
-      expect(req.method).to.equal('GET');
-      expect(req.path).to.equal('/hello/:id');
+      expect(req.method).toEqual('GET');
+      expect(req.path).toEqual('/hello/:id');
       res.done(null, { x: 123 });
     });
 
@@ -64,8 +64,8 @@ describe('#handler', function() {
 
     var context = {
       done: function(err, data) {
-        expect(err).to.be.null;
-        expect(data).to.deep.equal({ x: 123 });
+        expect(err).toBeNull();
+        expect(data).toEqual({ x: 123 });
         testDone();
       }
     };
@@ -81,8 +81,8 @@ describe('#handler', function() {
       expect.fail();
     });
     lambda.post('/hello/world', function(req, res) {
-      expect(req.method).to.equal('POST');
-      expect(req.path).to.equal('/hello/world');
+      expect(req.method).toEqual('POST');
+      expect(req.path).toEqual('/hello/world');
       res.done(null, { x: 123 });
     });
 
@@ -93,8 +93,8 @@ describe('#handler', function() {
 
     var context = {
       done: function(err, data) {
-        expect(err).to.be.null;
-        expect(data).to.deep.equal({ x: 123 });
+        expect(err).toBeNull();
+        expect(data).toEqual({ x: 123 });
         testDone();
       }
     };
@@ -117,8 +117,8 @@ describe('#handler', function() {
 
     var context = {
       done: function(err, data) {
-        expect(err.message.indexOf('HTTP 404')).to.equal(0);
-        expect(data).to.be.undefined;
+        expect(err.message.indexOf('HTTP 404')).toEqual(0);
+        expect(data).toBeUndefined();
         testDone();
       }
     };
@@ -131,7 +131,7 @@ describe('#handler', function() {
 
     // Add a middleware the executes on the app before the handler:
     app.use(function(req, res) {
-      expect(res.isDone).to.equal(false);
+      expect(res.isDone).toEqual(false);
       req.appMiddlewareParam = 1;
       res.next();
     });
@@ -140,7 +140,7 @@ describe('#handler', function() {
 
     // Add a middleware that executes on the Lambda before the handler:
     lambda.use(function(req, res) {
-      expect(res.isDone).to.equal(false);
+      expect(res.isDone).toEqual(false);
       req.lambdaMiddlewareParam = req.appMiddlewareParam + 1;
       res.next();
     });
@@ -151,14 +151,14 @@ describe('#handler', function() {
 
     // Add a middleware that executes on the Lambda after the handler.
     lambda.use(function(req, res) {
-      expect(res.isDone).to.equal(true);
+      expect(res.isDone).toEqual(true);
       res.payload.push(3);
       res.next();
     });
 
     // Add a middleware that executes on the app after the handler.
     app.use(function(req, res) {
-      expect(res.isDone).to.equal(true);
+      expect(res.isDone).toEqual(true);
       res.payload.push(4);
       res.next();
     });
@@ -166,8 +166,8 @@ describe('#handler', function() {
     var event = { method: 'GET', path: '/hello' };
     var context = {
       done: function(err, data) {
-        expect(err).to.be.null;
-        expect(data).to.deep.equal([ 1, 2, 3, 4 ]);
+        expect(err).toBeNull();
+        expect(data).toEqual([ 1, 2, 3, 4 ]);
         testDone();
       }
     };
