@@ -14,9 +14,7 @@ lambdafai('hello-world', function(app) {
 ```
 
 Lambdafai is a simple framework for building and deploying REST APIs using AWS Lambda, API Gateway,
-DynamoDB, and S3.
-
-It consists of:
+DynamoDB, and S3. It consists of:
   * A library for routing and handling requests with syntax similar to the
     [Express](http://expressjs.com/) API.
   * A command-line tool for creating, testing, and deploying your API.
