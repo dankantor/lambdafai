@@ -1,6 +1,14 @@
 # lambdafai  [![Build Status](https://travis-ci.com/Clarifai/lambdafai.svg?token=hV4tTqzcLZhd9QUcMUt9&branch=master)](https://travis-ci.com/Clarifai/lambdafai)
 *Taking the “Lame” out of Lambda, since 2016*
 
+Lambdafai is a simple framework for building and deploying REST APIs using AWS Lambda, API Gateway,
+DynamoDB, and S3. It consists of:
+  * A library for routing and handling requests with [Express](http://expressjs.com/)-like syntax.
+  * A command-line tool for creating, testing, and deploying your API.
+  * A standard library to simplify interacting with AWS services like DynamoDB.
+    * Using this library is optional - you can interact directly with the AWS APIs if you want
+
+#### Code
 ```js
 var lambdafai = require('lambdafai');
 
@@ -13,12 +21,25 @@ lambdafai('hello-world', function(app) {
 });
 ```
 
-Lambdafai is a simple framework for building and deploying REST APIs using AWS Lambda, API Gateway,
-DynamoDB, and S3. It consists of:
-  * A library for routing and handling requests with [Express](http://expressjs.com/)-like syntax.
-  * A command-line tool for creating, testing, and deploying your API.
-  * A standard library to simplify interacting with AWS services like DynamoDB.
-    * Using this library is optional - you can interact directly with the AWS APIs if you want
+#### Create
+```
+node index.js create-resources dev
+```
+
+#### Test
+```
+node index.js invoke dev "{path: '/hello'}"
+```
+
+#### Deploy
+```
+node index.js deploy dev
+```
+
+#### Ship
+```
+node index.js promote dev prod
+```
 
 
 ## Getting Started
