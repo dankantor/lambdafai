@@ -1,0 +1,9 @@
+{
+  "name": "lambdafai-hello-world",
+  "version": "0.0.1",
+  "author": "Clarifai, Inc.",
+  "license": "none",
+  "dependencies": {
+    "lambdafai": "../.."
+  }
+}
