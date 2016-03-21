@@ -112,6 +112,43 @@ describe('Database', function() {
     });
   });
 
+  describe("#batchGet", function() {
+    it("gets items", function() {
+      db.table('T').batchGet({Keys: [{h: 'hash', r: 123}, {h: 'sash', r: 456}]}, capture);
+
+      expect(client.batchGet).toHaveBeenCalledWith({
+        RequestItems: { 'T': { Keys: [{h: 'hash', r: 123}, {h: 'sash', r: 456}]}}
+      }, jasmine.any(Function));
+
+      var items = [{ h: 'hash', r: 123, createdAt: 111, modifiedAt: 222, title: 'Hi' },
+                   { h: 'sash', r: 456, createdAt: 333, modifiedAt: 444, title: 'Bye' }];
+      invokeCallback(client.batchGet, null, { Responses: { 'T': items } });
+      expect(err).toBeNull();
+      expect(result).toEqual(items);
+    });
+
+    it("unprocessed keys", function() {
+      db.table('T').batchGet({Keys: [{h: 'hash', r: 123}, {h: 'sash', r: 456}]}, capture);
+
+      invokeCallback(client.batchGet, null, {
+        Responses: {
+          'T': [{ h: 'hash', r: 123, createdAt: 111, modifiedAt: 222, title: 'Hi' }]
+        },
+        UnprocessedKeys: {
+          'T': { Keys: [ { h: 'sash', r: 456 } ], }
+        }
+      });
+      expect(err.status).toEqual(500);
+      expect(result).toBeUndefined();
+    });
+
+    it("error from dynamodb", function() {
+      db.table('T').batchGet({Keys: [{h: 'hash', r: 123}, {h: 'sash', r: 456}]}, capture);
+      invokeCallback(client.batchGet, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+    });
+  });
+
   describe('#put', function() {
     it('inserts new item', function() {
       db.table('T').put({Item: {h: 'hash', r: 123, title: 'Hello, world'}}, capture);
@@ -270,6 +307,251 @@ describe('Database', function() {
     it('handles dynamodb error', function() {
       db.table('T').delete({Key: {h: 'hash', r: 123}}, capture);
       invokeCallback(client.delete, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+    });
+  });
+
+  describe("ACL#getPermissions", function() {
+    it("gets permissions", function() {
+      db.acl('A').getPermissions({User: 'user123', Resource: 'album:abc'}, capture);
+      expect(client.get).toHaveBeenCalledWith({
+        TableName: 'A', Key: {userID: 'user123', res: 'album:abc'}
+      }, jasmine.any(Function));
+
+      invokeCallback(client.get, null, {Item: {userID: 'user123', res: 'album:abc', r: 1}});
+      expect(err).toBeNull();
+      expect(result).toEqual({userID: 'user123', res: 'album:abc', r: 1});
+    });
+
+    it("handles not found permission", function() {
+      db.acl('A').getPermissions({User: 'user123', Resource: 'album:abc'}, capture);
+      invokeCallback(client.get, null, {});
+      expect(err).toBeNull();
+      expect(result).toEqual({userID: 'user123', res: 'album:abc'});
+    });
+
+    it("handles dynamodb error", function() {
+      db.acl('A').getPermissions({User: 'user123', Resource: 'album:abc'}, capture);
+      invokeCallback(client.get, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+      expect(result).toBeUndefined();
+    });
+  });
+
+  describe("ACL#checkPermissions", function() {
+    it("passing case", function() {
+      db.acl('A').checkPermissions({User: 'u', Resource: 'album:abc', Permissions: ['w']}, capture);
+      expect(client.get).toHaveBeenCalledWith({
+        TableName: 'A', Key: { userID: 'u', res: 'album:abc' }
+      }, jasmine.any(Function));
+      invokeCallback(client.get, null, {Item: { userID: 'u', res: 'album:abc', r: 1, w: 1 }});
+      expect(err).toBeNull();
+      expect(result).toBeUndefined();
+    });
+
+    it("failing case", function() {
+      db.acl('A').checkPermissions({User: 'u', Resource: 'album:abc', Permissions: ['r', 'w']},
+        capture);
+      invokeCallback(client.get, null, {Item: { userID: 'user123', res: 'album:abc', r: 1 }});
+      expect(err.status).toEqual(403);
+    });
+
+    it("handles dynamodb error", function() {
+      db.acl('A').checkPermissions({User: 'u', Resource: 'album:abc', Permissions: ['w']}, capture);
+      invokeCallback(client.get, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+    });
+  });
+
+  describe("ACL#grantPermissions", function() {
+    it("grants permissions", function() {
+      db.acl('A').grantPermissions({User: 'u', Resource: 'album:abc', Permissions: ['r', 'w']},
+        capture);
+      expect(client.update).toHaveBeenCalledWith({
+        TableName: 'A',
+        Key: { userID: 'u', res: 'album:abc' },
+        UpdateExpression: 'SET #p0=:p0, #p1=:p1',
+        ExpressionAttributeNames: { '#p0': 'r', '#p1': 'w' },
+        ExpressionAttributeValues: { ':p0': 1, ':p1': 1 },
+      }, jasmine.any(Function));
+      invokeCallback(client.update, null, {});
+      expect(err).toBeNull();
+      expect(result).toBeUndefined();
+    });
+
+    it("handles dynamodb error", function() {
+      db.acl('A').grantPermissions({User: 'u', Resource: 'album:abc', Permissions: ['w']}, capture);
+      invokeCallback(client.update, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+    });
+  });
+
+  describe("ACL#revokePermissions", function() {
+    it("revokes permissions", function() {
+      db.acl('A').revokePermissions({User: 'u', Resource: 'album:abc'}, capture);
+      expect(client.delete).toHaveBeenCalledWith({
+        TableName: 'A', Key: { userID: 'u', res: 'album:abc' }
+      }, jasmine.any(Function));
+      invokeCallback(client.delete, null, {});
+      expect(err).toBeNull();
+      expect(result).toBeUndefined();
+    });
+
+    it("handles dynamodb error", function() {
+      db.acl('A').revokePermissions({User: 'u', Resource: 'album:abc'}, capture);
+      invokeCallback(client.delete, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+    });
+  });
+
+  describe("ACL#revokeAllPermissionsForResource", function() {
+    it("revokes single permission", function() {
+      var grants = [ { userID: 'user123', res: 'album:abc', r: 1 } ];
+      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+
+      invokeCallback(client.query, null, { Items: grants });
+      expect(client.batchWrite).toHaveBeenCalledWith({
+        RequestItems: {'A': [{ DeleteRequest: { Key: { userID: 'user123', res: 'album:abc' }}}]}
+      }, jasmine.any(Function));
+
+      invokeCallback(client.batchWrite, null, {});
+      expect(err).toBeNull();
+      expect(result).toBeUndefined();
+    });
+
+    it("revokes multiple batches of permissions in parallel", function() {
+      var grants = [];
+      var firstBatch = [];
+      for (var i = 0; i < 27; i++) {
+        grants.push({ userID: 'user' + i, res: 'album:abc', r: 1});
+        if (i < 25) {
+          firstBatch.push({ DeleteRequest: { Key: { userID: 'user' + i, res: 'album:abc' }}});
+        }
+      }
+      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+
+      invokeCallback(client.query, null, { Items: grants });
+      expect(client.batchWrite).toHaveBeenCalledWith({ RequestItems: { 'A': firstBatch }},
+        jasmine.any(Function));
+
+      // Explicitly check the second batch to guard against bugs in the test:
+      expect(client.batchWrite).toHaveBeenCalledWith({
+        RequestItems: {
+          'A': [
+            { DeleteRequest: { Key: { userID: 'user25', res: 'album:abc' }}},
+            { DeleteRequest: { Key: { userID: 'user26', res: 'album:abc' }}},
+          ]
+        }
+      }, jasmine.any(Function));
+      client.batchWrite.calls.argsFor(0)[1](undefined, {});
+      client.batchWrite.calls.argsFor(1)[1](undefined, {});
+      expect(err).toBeNull();
+      expect(result).toBeUndefined();
+    });
+
+    it("handles dynamodb error in get", function() {
+      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+      invokeCallback(client.query, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+    });
+
+    it("handles dynamodb error in batchWrite", function() {
+      var grants = [ { userID: 'user123', res: 'album:abc', r: 1 } ];
+      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+      invokeCallback(client.query, null, { Items: grants });
+      invokeCallback(client.batchWrite, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+    });
+
+    it("handles unprocessed items as error", function() {
+      var grants = [ { userID: 'user123', res: 'album:abc', r: 1 } ];
+      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+      invokeCallback(client.query, null, { Items: grants });
+      invokeCallback(client.batchWrite, null, {
+        UnprocessedItems: {
+          'A':  [{ DeleteRequest: { Key: { userID: 'user123', res: 'album:abc' }}}]
+        }
+      });
+      expect(err.status).toEqual(500);
+      expect(err.message).toContain('Unprocessed Items');
+    });
+  });
+
+  describe("ACL#grantsForUser", function() {
+    it("returns grants", function() {
+      db.acl('A').grantsForUser({User: 'user123'}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'A',
+        KeyConditionExpression: 'userID=:userID',
+        ExpressionAttributeValues: { ':userID': 'user123' },
+        ConsistentRead: true,
+        ScanIndexForward: false,
+        Limit: 10,
+      }, jasmine.any(Function));
+
+      var grants = [
+        { userID: 'user123', res: 'album:abc', r: 1 },
+        { userID: 'user123', res: 'album:zyxw', r: 1, w: 1 },
+      ];
+      invokeCallback(client.query, null, { Items: grants });
+      expect(err).toBeNull();
+      expect(result).toEqual(grants);
+    });
+
+    it("handles limit and lastResource", function() {
+      db.acl('A').grantsForUser({User: 'user123', Limit: 2, LastResource: 'album:zzz'}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'A',
+        KeyConditionExpression: 'userID=:userID AND res<:lastResource',
+        ExpressionAttributeValues: { ':userID': 'user123', ':lastResource': 'album:zzz' },
+        ConsistentRead: true,
+        ScanIndexForward: false,
+        Limit: 2,
+      }, jasmine.any(Function));
+    });
+
+    it("handles ResourcePrefix", function() {
+      db.acl('A').grantsForUser({User: 'user123', ResourcePrefix: 'album:'}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'A',
+        KeyConditionExpression: 'userID=:userID AND res begins_with :prefix',
+        ExpressionAttributeValues: { ':userID': 'user123', ':prefix': 'album:' },
+        ConsistentRead: true,
+        ScanIndexForward: false,
+        Limit: 10,
+      }, jasmine.any(Function));
+    });
+
+    it("handles dynamodb error", function() {
+      db.acl('A').grantsForUser({User: 'user123'}, capture);
+      invokeCallback(client.query, new Error('Failed'));
+      expect(err.message).toEqual('Failed');
+    });
+  });
+
+  describe("ACL#grantsForResource", function() {
+    it("returns grants", function() {
+      db.acl('A').grantsForResource({Resource: 'album:abc'}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'A',
+        IndexName: 'by-resource',
+        KeyConditionExpression: 'res=:res',
+        ExpressionAttributeValues: { ':res': 'album:abc' },
+        ConsistentRead: false,
+        ScanIndexForward: true,
+      }, jasmine.any(Function));
+      var grants = [
+        { userID: 'user123', res: 'album:abc', r: 1 },
+        { userID: 'user123', res: 'album:abc', r: 1, w: 1 },
+      ];
+      invokeCallback(client.query, null, { Items: grants });
+      expect(err).toBeNull();
+      expect(result).toEqual(grants);
+    });
+
+    it("handles dynamodb error", function() {
+      db.acl('A').grantsForResource({Resource: 'album:abc'}, capture);
+      invokeCallback(client.query, new Error('Failed'));
       expect(err.message).toEqual('Failed');
     });
   });
