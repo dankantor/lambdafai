@@ -1,6 +1,6 @@
 {
   "source": {
-    "include": [ "lib/api" ]
+    "include": [ "lib/api", "lib/index.js" ]
   },
   "opts": {
     "destination": "./docs",
