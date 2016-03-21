@@ -1,10 +1,10 @@
 var handler = require('../lib/handler');
-var App = require('../lib/api/app');
+var Application = require('../lib/api/application');
 
 
 describe('#handler', function() {
   it('invokes lambda with request', function(testDone) {
-    var app = new App('my-app');
+    var app = new Application('my-app');
     var lambda = app.lambda({ name: 'my-lambda' });
 
     lambda.get('/hello/world', function(req, res) {
@@ -46,7 +46,7 @@ describe('#handler', function() {
   });
 
   it('routes request with path arguments', function(testDone) {
-    var app = new App('test-app');
+    var app = new Application('test-app');
     var lambda = app.lambda({ name: 'my-lambda' });
 
     lambda.get('/hello/:id', function(req, res) {
@@ -74,7 +74,7 @@ describe('#handler', function() {
   });
 
   it('routes to correct handler based on method', function(testDone) {
-    var app = new App('test-app');
+    var app = new Application('test-app');
     var lambda = app.lambda({ name: 'my-lambda' });
 
     lambda.get('/hello/world', function(req, res) {
@@ -103,7 +103,7 @@ describe('#handler', function() {
   });
 
   it('returns 404 if no handler found', function(testDone) {
-    var app = new App('test-app');
+    var app = new Application('test-app');
     var lambda = app.lambda({ name: 'my-lambda' });
 
     lambda.get('/hello', function(req, res) { res.done(null, {}); });
@@ -127,7 +127,7 @@ describe('#handler', function() {
   });
 
   it('executes middleware', function(testDone) {
-    var app = new App('test-app');
+    var app = new Application('test-app');
 
     // Add a middleware the executes on the app before the handler:
     app.use(function(req, res) {
