@@ -93,6 +93,12 @@ curl https://{id}.execute-api.us-east-1.amazonaws.com/dev/hello
 ```
 You should see a `"Hello, world!"` response.
 
+For rapid iteration, you can also deploy a single Lambda without deploying API Gateway:
+```
+node index.js deploy dev --lambda hello
+```
+
+
 
 ### Promotion
 
