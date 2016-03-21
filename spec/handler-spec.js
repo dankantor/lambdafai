@@ -21,6 +21,7 @@ describe('#handler', function() {
     });
 
     var event = {
+      stage: 'dev',
       method: 'GET',
       path: '/hello/world',
       headers: '{Content-Type=application/javascript, Accept=*/*, text/*}',
@@ -56,6 +57,7 @@ describe('#handler', function() {
     });
 
     var event = {
+      stage: 'dev',
       method: 'GET',
       path: '/hello/{id}',
       headers: '{Content-Type=application/javascript, Accept=*/*, text/*}',
@@ -86,11 +88,7 @@ describe('#handler', function() {
       res.done(null, { x: 123 });
     });
 
-    var event = {
-      method: 'POST',
-      path: '/hello/world',
-    };
-
+    var event = { stage: 'dev', method: 'POST', path: '/hello/world' };
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
@@ -109,6 +107,7 @@ describe('#handler', function() {
     lambda.get('/hello', function(req, res) { res.done(null, {}); });
 
     var event = {
+      stage: 'dev',
       method: 'GET',
       path: '/hello/world',
       headers: '{Content-Type=application/javascript, Accept=*/*, text/*}',
@@ -163,7 +162,7 @@ describe('#handler', function() {
       res.next();
     });
 
-    var event = { method: 'GET', path: '/hello' };
+    var event = { stage: 'dev', method: 'GET', path: '/hello' };
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
