@@ -1,5 +1,5 @@
 # lambdafai  [![Build Status](https://travis-ci.com/Clarifai/lambdafai.svg?token=hV4tTqzcLZhd9QUcMUt9&branch=master)](https://travis-ci.com/Clarifai/lambdafai)
-*Taking the “Lame” out of Lambda, since 2016*
+*We take the “Lame” out of Lambda*
 
 Lambdafai is a simple framework for building and deploying REST APIs using AWS Lambda, API Gateway,
 DynamoDB, and S3. It consists of:
@@ -28,7 +28,7 @@ node index.js create-resources dev
 
 #### Test
 ```
-node index.js invoke dev "{path: '/hello'}"
+node index.js invoke dev '{path: "/hello"}'
 ```
 
 #### Deploy
