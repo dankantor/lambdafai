@@ -4,10 +4,7 @@
   "description": "TODO",
   "author": "Clarifai, Inc.",
   "license": "none",
-  "devDependencies": {
-    "gulp": "^3.9.0"
-  },
   "dependencies": {
-    "lambdafai": "../.."
+    "lambdafai": "git+ssh://git@github.com/clarifai/lambdafai.git"
   }
 }
