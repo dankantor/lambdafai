@@ -102,14 +102,22 @@ node index.js deploy dev --lambda hello
 
 ### Promotion
 
-After you're happy with the API in your `dev` environment, you can promote to `staging` and then to `prod`
+After you're happy with the API in your `dev` environment, you can promote to `staging` and `prod`
 using the `promote` command. Alternately, you can use whatever deployment workflow you want -- environments
 are just names.
+
+Typically, these environments will already exist, but since this is our first time, we need to create them:
+```
+node index.js create-resources staging
+node index.js create-resources prod
+```
+
+Now we're ready to promote:
 ```
 node index.js promote dev staging
 ```
 
-This promotes what is currently running in `dev` to `staging` for both Lambda and API Gateway. You
+This takes what's currently running in the `dev` environment for Lambda and API Gateway and copies it to `staging`. You
 can now access your API in staging:
 ```
 curl https://{id}.execute-api.us-east-1.amazonaws.com/staging/hello
