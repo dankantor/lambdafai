@@ -6,11 +6,8 @@ lambdafai('lambdafai-todo-example', function(app) {
   // Define DynamoDB tables:
   app.table({ name: 'todos', key: ['userID', 'todoID'] });
 
-  // Define S3 buckets:
-  app.bucket({ name: 'attachments' });
-
   // Define Lambdas:
-  var todos = app.lambda({ name: 'todos', ram: 512 });
+  var todos = app.lambda({ name: 'todos' });
 
   // Add middleware to authenticate the user. For this demo, it just uses the "X-User" header.
   todos.use(function(req, res) {

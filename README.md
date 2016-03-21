@@ -48,10 +48,10 @@ The easiest way to get started is to jump into the
 [Hello World example](https://github.com/Clarifai/lambdafai/tree/master/examples/hello-world).
 This demonstrates how to use Lambdafai in a development workflow using the command-line tool.
 
-The [To-do example](https://github.com/Clarifai/lambdafai/tree/master/examples/todo) is a more
-complete example that demonstrates how to use DynamoDB and S3 support.
+The [TODO example](https://github.com/Clarifai/lambdafai/tree/master/examples/todo) is a more
+complete example that demonstrates how to use DynamoDB support and middleware.
 
-You can view the full API Reference by running:
+View the full generated API Reference by running:
 ```
 npm run jsdoc
 ```
