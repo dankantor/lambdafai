@@ -2,7 +2,7 @@ var lambdafai = require('lambdafai');
 var db = lambdafai.database;
 var errors = lambdafai.errors;
 
-lambdafai('todo-example', function(app) {
+lambdafai('lambdafai-todo-example', function(app) {
   // Define DynamoDB tables:
   app.table({ name: 'todos', key: ['userID', 'todoID'] });
 
