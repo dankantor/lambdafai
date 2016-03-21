@@ -123,14 +123,14 @@ node index.js promote staging prod
 #### Rollbacks
 
 Being able to roll back to the previous prod version can be useful. To do this, promote prod to a
-`rollback` environment **before** deploying staging to prod, i.e.:
+different environment, say `prod_old`, **before** deploying staging to prod, i.e.:
 ```
-node index.js promote prod rollback
+node index.js promote prod prod_old
 node index.js promote staging prod
 ```
 
-Then, if you need to rollback, you can simply promote `rollback` to `prod` to get your old
+Then, if you need to rollback, you can simply promote `prod_old` to `prod` to get your old
 environment back:
 ```
-node index.js promote rollback prod
+node index.js promote prod_old prod
 ```
