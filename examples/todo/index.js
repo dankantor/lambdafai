@@ -6,14 +6,14 @@ lambdafai('lambdafai-todo-example', function(app) {
   // Define DynamoDB tables:
   app.table({ name: 'todos', key: ['userID', 'todoID'] });
 
-  // Define Lambdas:
-  var todos = app.lambda({ name: 'todos' });
-
   // Add middleware to authenticate the user. For this demo, it just uses the "X-User" header.
-  todos.use(function(req, res) {
+  app.use(function(req, res) {
     req.userID = req.headers['X-User'] || 'default';
     res.next();
   });
+
+  // Define Lambdas:
+  var todos = app.lambda({ name: 'todos' });
 
   // Implement CRUD endpoints:
   todos.get('/todos', function(req, res) {
