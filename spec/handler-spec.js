@@ -151,14 +151,14 @@ describe('#handler', function() {
     // Add a middleware that executes on the Lambda after the handler.
     lambda.use(function(req, res) {
       expect(res.isDone).toEqual(true);
-      res.payload.push(3);
+      res.body.push(3);
       res.next();
     });
 
     // Add a middleware that executes on the app after the handler.
     app.use(function(req, res) {
       expect(res.isDone).toEqual(true);
-      res.payload.push(4);
+      res.body.push(4);
       res.next();
     });
 
