@@ -6,12 +6,14 @@
   "author": "Clarifai, Inc.",
   "license": "none",
   "scripts": {
+    "pretest": "node_modules/jshint/bin/jshint lib",
     "test": "node_modules/jasmine/bin/jasmine.js",
     "jsdoc": "node_modules/jsdoc/jsdoc.js -c jsdoc.json ; open docs/index.html"
   },
   "devDependencies": {
     "jasmine": "^2.4.1",
-    "jsdoc": "^3.4.0"
+    "jsdoc": "^3.4.0",
+    "jshint": "^2.9.1"
   },
   "dependencies": {
     "argparse": "^1.0.6",
