@@ -18,18 +18,13 @@ lambdafai('lambdafai-todo-example', function(app) {
   // Implement CRUD endpoints:
   todos.get('/todos', function(req, res) {
     db.table(req, 'todos').list({
-      HashKey: {
-        userID: req.userID
-      }
+      Key: { userID: req.userID }
     }, res.done);
   });
 
   todos.get('/todos/:id', function(req, res) {
     db.table(req, 'todos').get({
-      Key: {
-        userID: req.userID,
-        todoID: req.params.id,
-      }
+      Key: { userID: req.userID, todoID: req.params.id }
     }, res.done);
   });
 
@@ -54,10 +49,7 @@ lambdafai('lambdafai-todo-example', function(app) {
 
   todos.delete('/todos/:id', function(req, res) {
     db.table(req, 'todos').delete({
-      Key: {
-        userID: req.userID,
-        todoID: req.params.id
-      }
+      Key: { userID: req.userID, todoID: req.params.id }
     }, res.done);
   });
 });
