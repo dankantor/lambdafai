@@ -30,7 +30,7 @@ describe('Database', function() {
 
   describe('#list', function() {
     it('lists items', function() {
-      db.table('T').list({HashKey: {h: 'hash'}}, capture);
+      db.table('T').list({Key: {h: 'hash'}}, capture);
       expect(client.query).toHaveBeenCalledWith({
         TableName: 'T',
         KeyConditionExpression: '#hashKey=:hashKey',
@@ -49,7 +49,7 @@ describe('Database', function() {
     });
 
     it('lists items with range key limits', function() {
-      db.table('T').list({HashKey: {h: 'hash'}, MinRangeKey: {r: 123}, MaxRangeKey: {r: 987}},
+      db.table('T').list({Key: {h: 'hash'}, MinRangeKey: {r: 123}, MaxRangeKey: {r: 987}},
         capture);
       expect(client.query).toHaveBeenCalledWith({
         TableName: 'T',
@@ -64,14 +64,14 @@ describe('Database', function() {
     });
 
     it('empty result', function() {
-      db.table('T').list({HashKey: {h: 'hash'}}, capture);
+      db.table('T').list({Key: {h: 'hash'}}, capture);
       invokeCallback(client.query, null, { Items: [] });
       expect(err).toBeNull();
       expect(result).toEqual([]);
     });
 
     it('error from dynamodb', function() {
-      db.table('T').list({HashKey: {h: 'hash'}}, capture);
+      db.table('T').list({Key: {h: 'hash'}}, capture);
       client.query.calls.argsFor(0)[1](new Error('Fail'));
       expect(err.message).toBe('Fail');
     });
