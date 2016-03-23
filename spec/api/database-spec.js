@@ -260,7 +260,7 @@ describe('Database', function() {
 
   describe('increment', function() {
     it('increments fields', function() {
-      db.table('T').increment({Key: {h: 'hash', r: 123}, Increment: {foo: 2, bar: -1}}, capture);
+      db.table('T').increment({Key: {h: 'hash', r: 123}, Amount: {foo: 2, bar: -1}}, capture);
       expect(client.update).toHaveBeenCalledWith({
         TableName: 'T',
         Key: { h: 'hash', r: 123 },
@@ -277,7 +277,7 @@ describe('Database', function() {
     });
 
     it('handles not found', function() {
-      db.table('T').increment({Key: {h: 'hash', r: 123}, Increment: {foo: 2}}, capture);
+      db.table('T').increment({Key: {h: 'hash', r: 123}, Amount: {foo: 2}}, capture);
       var e = new Error('Failed');
       e.name = 'ConditionalCheckFailedException';
       invokeCallback(client.update, e);
@@ -285,7 +285,7 @@ describe('Database', function() {
     });
 
     it('handles dynamodb error', function() {
-      db.table('T').increment({Key: {h: 'hash', r: 123}, Increment: {foo: 2}}, capture);
+      db.table('T').increment({Key: {h: 'hash', r: 123}, Amount: {foo: 2}}, capture);
       invokeCallback(client.update, new Error('Failed'));
       expect(err.message).toEqual('Failed');
     });
