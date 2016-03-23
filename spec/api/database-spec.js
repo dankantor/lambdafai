@@ -498,24 +498,41 @@ describe('Database', function() {
       expect(result).toEqual(grants);
     });
 
-    it("handles limit and lastResource", function() {
-      db.acl('A').grantsForUser({User: 'user123', Limit: 2, LastResource: 'album:zzz'}, capture);
+    it("handles limit and max resource", function() {
+      db.acl('A').grantsForUser({User: 'user123', Limit: 2, MaxResource: 'album:zzz'}, capture);
       expect(client.query).toHaveBeenCalledWith({
         TableName: 'A',
-        KeyConditionExpression: 'userID=:userID AND res<:lastResource',
-        ExpressionAttributeValues: { ':userID': 'user123', ':lastResource': 'album:zzz' },
+        KeyConditionExpression: 'userID=:userID AND res<=:maxResource',
+        ExpressionAttributeValues: { ':userID': 'user123', ':maxResource': 'album:zzz' },
         ConsistentRead: true,
         ScanIndexForward: false,
         Limit: 2,
       }, jasmine.any(Function));
     });
 
-    it("handles ResourcePrefix", function() {
-      db.acl('A').grantsForUser({User: 'user123', ResourcePrefix: 'album:'}, capture);
+    it("handles min resource", function() {
+      db.acl('A').grantsForUser({User: 'user123', MinResource: 'album:'}, capture);
       expect(client.query).toHaveBeenCalledWith({
         TableName: 'A',
-        KeyConditionExpression: 'userID=:userID AND res begins_with :prefix',
-        ExpressionAttributeValues: { ':userID': 'user123', ':prefix': 'album:' },
+        KeyConditionExpression: 'userID=:userID AND res>=:minResource',
+        ExpressionAttributeValues: { ':userID': 'user123', ':minResource': 'album:' },
+        ConsistentRead: true,
+        ScanIndexForward: false,
+        Limit: 10,
+      }, jasmine.any(Function));
+    });
+
+    it("handles min resource and max resource", function() {
+      db.acl('A').grantsForUser({User: 'user123', MinResource: 'album:', MaxResource: 'album:zzz'},
+        capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'A',
+        KeyConditionExpression: 'userID=:userID AND res BETWEEN :minResource AND :maxResource',
+        ExpressionAttributeValues: {
+          ':userID': 'user123',
+          ':minResource': 'album:',
+          ':maxResource': 'album:zzz',
+        },
         ConsistentRead: true,
         ScanIndexForward: false,
         Limit: 10,
