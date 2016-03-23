@@ -4,6 +4,6 @@
   "author": "Clarifai, Inc.",
   "license": "none",
   "dependencies": {
-    "lambdafai": "git+ssh://git@github.com/clarifai/lambdafai.git"
+    "lambdafai": "https://github.com/clarifai/lambdafai.git"
   }
 }
