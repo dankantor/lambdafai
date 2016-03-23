@@ -404,10 +404,10 @@ describe('Database', function() {
     });
   });
 
-  describe("ACL#revokeAllPermissionsForResource", function() {
+  describe("ACL#revokeAllPermissions", function() {
     it("revokes single permission", function() {
       var grants = [ { userID: 'user123', res: 'album:abc', r: 1 } ];
-      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+      db.acl('A').revokeAllPermissions({Resource: 'album:abc'}, capture);
 
       invokeCallback(client.query, null, { Items: grants });
       expect(client.batchWrite).toHaveBeenCalledWith({
@@ -428,7 +428,7 @@ describe('Database', function() {
           firstBatch.push({ DeleteRequest: { Key: { userID: 'user' + i, res: 'album:abc' }}});
         }
       }
-      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+      db.acl('A').revokeAllPermissions({Resource: 'album:abc'}, capture);
 
       invokeCallback(client.query, null, { Items: grants });
       expect(client.batchWrite).toHaveBeenCalledWith({ RequestItems: { 'A': firstBatch }},
@@ -450,14 +450,14 @@ describe('Database', function() {
     });
 
     it("handles dynamodb error in get", function() {
-      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+      db.acl('A').revokeAllPermissions({Resource: 'album:abc'}, capture);
       invokeCallback(client.query, new Error('Failed'));
       expect(err.message).toEqual('Failed');
     });
 
     it("handles dynamodb error in batchWrite", function() {
       var grants = [ { userID: 'user123', res: 'album:abc', r: 1 } ];
-      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+      db.acl('A').revokeAllPermissions({Resource: 'album:abc'}, capture);
       invokeCallback(client.query, null, { Items: grants });
       invokeCallback(client.batchWrite, new Error('Failed'));
       expect(err.message).toEqual('Failed');
@@ -465,7 +465,7 @@ describe('Database', function() {
 
     it("handles unprocessed items as error", function() {
       var grants = [ { userID: 'user123', res: 'album:abc', r: 1 } ];
-      db.acl('A').revokeAllPermissionsForResource({Resource: 'album:abc'}, capture);
+      db.acl('A').revokeAllPermissions({Resource: 'album:abc'}, capture);
       invokeCallback(client.query, null, { Items: grants });
       invokeCallback(client.batchWrite, null, {
         UnprocessedItems: {
