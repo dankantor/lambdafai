@@ -1,3 +1,4 @@
+var Application = require('../../lib/api/application');
 var events = require('../../lib/internal/lambda-events');
 
 // Events: these are taken from the Lambda test event generator:
@@ -15,7 +16,7 @@ var S3_PUT = {
         "object": {
           "eTag": "0123456789abcdef0123456789abcdef",
           "sequencer": "0A1B2C3D4E5F678901",
-          "key": "HappyFace.jpg",
+          "key": "uploads/HappyFace.jpg",
           "size": 1024
         },
         "bucket": {
@@ -53,7 +54,7 @@ var S3_DELETE = {
         "configurationId": "testConfigRule",
         "object": {
           "sequencer": "0A1B2C3D4E5F678901",
-          "key": "HappyFace.jpg"
+          "key": "uploads/HappyFace.jpg"
         },
         "bucket": {
           "arn": "arn:aws:s3:::sourcebucket",
@@ -126,15 +127,26 @@ var CONTEXT = {
 }
 
 describe('LambdaEvents#standardizeEvent', function() {
+  var app;
+
+  beforeEach(function() {
+    app = new Application('test');
+    app.lambda({ name: 'foo' })
+       .s3put('/uploads/:name', null)
+  });
+
   it('passes through API gateway event', function() {
-    expect(events.standardizeEvent(API_GATEWAY_EVENT, CONTEXT)).toEqual(API_GATEWAY_EVENT);
+    expect(events.standardizeEvent(app, API_GATEWAY_EVENT, CONTEXT)).toEqual(API_GATEWAY_EVENT);
   });
 
   it('converts S3 put event', function() {
-    expect(events.standardizeEvent(S3_PUT, CONTEXT)).toEqual({
+    expect(events.standardizeEvent(app, S3_PUT, CONTEXT)).toEqual({
       method: 'S3PUT',
       stage: 'dev',
-      path: '/HappyFace.jpg',
+      path: '/uploads/HappyFace.jpg',
+      params: {
+        name: 'HappyFace.jpg'
+      },
       body: {
         Size: 1024,
         Bucket: 'sourcebucket'
@@ -143,10 +155,10 @@ describe('LambdaEvents#standardizeEvent', function() {
   });
 
   it('rejects s3 delete event', function() {
-    expect(events.standardizeEvent(S3_DELETE, CONTEXT)).toBeUndefined();
+    expect(events.standardizeEvent(app, S3_DELETE, CONTEXT)).toBeUndefined();
   });
 
   it('rejects DynamoDB event', function() {
-    expect(events.standardizeEvent(DYNAMODB_UPDATE, CONTEXT)).toBeUndefined();
+    expect(events.standardizeEvent(app, DYNAMODB_UPDATE, CONTEXT)).toBeUndefined();
   });
 });
