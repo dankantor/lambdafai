@@ -144,9 +144,8 @@ describe('LambdaEvents#standardizeEvent', function() {
       method: 'S3PUT',
       stage: 'dev',
       path: '/uploads/HappyFace.jpg',
-      params: {
-        name: 'HappyFace.jpg'
-      },
+      params: '{name=HappyFace.jpg}',
+      paramNames: '[name]',
       body: {
         Size: 1024,
         Bucket: 'sourcebucket'

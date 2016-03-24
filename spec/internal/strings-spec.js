@@ -26,6 +26,20 @@ describe('#parseAmazonDictionary', function() {
   });
 });
 
+describe('#toAmazonDictionaryNames and #toAmazonDictionaryPairs', function() {
+  it('generates Amazon dictionaries', function() {
+    expect(strings.toAmazonDictionaryNames(undefined)).toBe(undefined);
+    expect(strings.toAmazonDictionaryPairs(undefined)).toBe(undefined);
+    expect(strings.toAmazonDictionaryNames({})).toEqual('[]');
+    expect(strings.toAmazonDictionaryPairs({})).toEqual('{}');
+    expect(strings.toAmazonDictionaryNames({x: 'y'})).toEqual('[x]');
+    expect(strings.toAmazonDictionaryPairs({x: 'y'})).toEqual('{x=y}');
+    expect(strings.toAmazonDictionaryNames({x: 'Hello', a: 123})).toEqual('[a, x]');
+    expect(strings.toAmazonDictionaryPairs({x: 'Hello', a: 123})).toEqual('{a=123, x=Hello}');
+  });
+});
+
+
 describe('#checkIdentifier', function() {
   it('allows valid identifiers', function() {
     expect(strings.checkIdentifier('x'));
