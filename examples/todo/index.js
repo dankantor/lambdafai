@@ -17,13 +17,13 @@ lambdafai('lambdafai-todo-example', function(app) {
 
   // Implement CRUD endpoints:
   todos.get('/todos', function(req, res) {
-    db.table(req, 'todos').list({
+    db.table(req.tableName('todos')).list({
       Key: { userID: req.userID }
     }, res.done);
   });
 
   todos.get('/todos/:id', function(req, res) {
-    db.table(req, 'todos').get({
+    db.table(req.tableName('todos')).get({
       Key: { userID: req.userID, todoID: req.params.id }
     }, res.done);
   });
@@ -32,7 +32,7 @@ lambdafai('lambdafai-todo-example', function(app) {
     var item = req.body || {};
     item.userID = req.userID;
     item.todoID = new Date().getTime().toString(32);  // Assign a new ID based on the timestamp.
-    db.table(req, 'todos').put({
+    db.table(req.tableName('todos')).put({
       Item: item
     }, res.done);
   });
@@ -41,14 +41,14 @@ lambdafai('lambdafai-todo-example', function(app) {
     var item = req.body || {};
     item.userID = req.userID;
     item.todoID = req.params.id;
-    db.table(req, 'todos').put({
+    db.table(req.tableName('todos')).put({
       Item: item,
       AllowOverwrite: true
     }, res.done);
   });
 
   todos.delete('/todos/:id', function(req, res) {
-    db.table(req, 'todos').delete({
+    db.table(req.tableName('todos')).delete({
       Key: { userID: req.userID, todoID: req.params.id }
     }, res.done);
   });
