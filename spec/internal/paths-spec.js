@@ -56,3 +56,15 @@ describe('Paths#matchPath', function() {
     expect(paths.matchPath('/foo/:id', '/bar/123')).toBeUndefined();
   });
 });
+
+describe('Paths#expand', function() {
+  it('should correctly expand paths', function() {
+    expect(paths.expand('/', {x: 'xyz'})).toEqual('/');
+    expect(paths.expand('/foo', {x: 'xyz'})).toEqual('/foo');
+    expect(paths.expand('/:x', {x: 'xyz'})).toEqual('/xyz');
+    expect(paths.expand('/foo/:x', {x: 'xyz'})).toEqual('/foo/xyz');
+    expect(paths.expand('/:x/foo', {x: 'xyz'})).toEqual('/xyz/foo');
+    expect(paths.expand('/:x/:y', {x: 'xyz'})).toEqual('/xyz/:y');
+    expect(paths.expand('/:x/:y', {x: 'xyz', y: 'abc'})).toEqual('/xyz/abc');
+  });
+});
