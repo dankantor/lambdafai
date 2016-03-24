@@ -33,26 +33,38 @@ describe('Paths#expressToGateway', function() {
   });
 });
 
-describe('Paths#matchPath', function() {
+describe('Paths#match', function() {
   it('should correctly match paths', function() {
-    expect(paths.matchPath('', '')).toEqual({});
-    expect(paths.matchPath('/', '/')).toEqual({});
-    expect(paths.matchPath('/hello', '/hello')).toEqual({});
-    expect(paths.matchPath('/hello/', '/hello/')).toEqual({});
-    expect(paths.matchPath('/hello/world', '/hello/world')).toEqual({});
-    expect(paths.matchPath('/:id', '/123')).toEqual({ id: '123' });
-    expect(paths.matchPath('/foo/:id', '/foo/123')).toEqual({ id: '123' });
-    expect(paths.matchPath('/foo/:id/bar', '/foo/123/bar')).toEqual({ id: '123' });
-    expect(paths.matchPath('/foo/:id/:name', '/foo/123/bar'))
+    expect(paths.match('', '')).toEqual({});
+    expect(paths.match('/', '/')).toEqual({});
+    expect(paths.match('/hello', '/hello')).toEqual({});
+    expect(paths.match('/hello/', '/hello/')).toEqual({});
+    expect(paths.match('/hello/world', '/hello/world')).toEqual({});
+    expect(paths.match('/:id', '/123')).toEqual({ id: '123' });
+    expect(paths.match('/foo/:id', '/foo/123')).toEqual({ id: '123' });
+    expect(paths.match('/foo/:id/bar', '/foo/123/bar')).toEqual({ id: '123' });
+    expect(paths.match('/foo/:id/:name', '/foo/123/bar'))
         .toEqual({ id: '123', name: 'bar' });
   });
 
   it('should return undefined when paths do not match', function() {
-    expect(paths.matchPath('', '/')).toBeUndefined();
-    expect(paths.matchPath('/', '')).toBeUndefined();
-    expect(paths.matchPath('/foo', '/')).toBeUndefined();
-    expect(paths.matchPath('/foo', '/bar')).toBeUndefined();
-    expect(paths.matchPath('/foo/bar', '/foo/baz')).toBeUndefined();
-    expect(paths.matchPath('/foo/:id', '/bar/123')).toBeUndefined();
+    expect(paths.match('', '/')).toBeUndefined();
+    expect(paths.match('/', '')).toBeUndefined();
+    expect(paths.match('/foo', '/')).toBeUndefined();
+    expect(paths.match('/foo', '/bar')).toBeUndefined();
+    expect(paths.match('/foo/bar', '/foo/baz')).toBeUndefined();
+    expect(paths.match('/foo/:id', '/bar/123')).toBeUndefined();
+  });
+});
+
+describe('Paths#substitute', function() {
+  it('should correctly expand paths', function() {
+    expect(paths.substitute('/', {x: 'xyz'})).toEqual('/');
+    expect(paths.substitute('/foo', {x: 'xyz'})).toEqual('/foo');
+    expect(paths.substitute('/:x', {x: 'xyz'})).toEqual('/xyz');
+    expect(paths.substitute('/foo/:x', {x: 'xyz'})).toEqual('/foo/xyz');
+    expect(paths.substitute('/:x/foo', {x: 'xyz'})).toEqual('/xyz/foo');
+    expect(paths.substitute('/:x/:y', {x: 'xyz'})).toEqual('/xyz/:y');
+    expect(paths.substitute('/:x/:y', {x: 'xyz', y: 'abc'})).toEqual('/xyz/abc');
   });
 });
