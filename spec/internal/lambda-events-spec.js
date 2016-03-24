@@ -135,9 +135,9 @@ describe('LambdaEvents#standardizeEvent', function() {
       method: 'S3PUT',
       stage: 'dev',
       path: '/HappyFace.jpg',
-      headers: {
-        'Content-Length': 1024,
-        'X-Bucket-Name': 'sourcebucket'
+      body: {
+        Size: 1024,
+        Bucket: 'sourcebucket'
       }
     });
   });
