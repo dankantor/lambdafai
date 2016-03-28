@@ -122,6 +122,19 @@ var API_GATEWAY_EVENT = {
   query: {}
 };
 
+var SCHEDULED_EVENT = {
+  "account": "123456789012",
+  "region": "us-east-1",
+  "detail": {},
+  "detail-type": "Scheduled Event",
+  "source": "aws.events",
+  "time": "1970-01-01T00:00:00Z",
+  "id": "cdc73f9d-aea9-11e3-9d5a-835b769c0d9c",
+  "resources": [
+    "arn:aws:events:us-east-1:123456789012:rule/my-schedule"
+  ]
+};
+
 var CONTEXT = {
   invokedFunctionArn: 'arn:aws:lambda:us-east-1:12345678:function:hello-world-hello:dev'
 }
@@ -133,6 +146,7 @@ describe('LambdaEvents#standardizeEvent', function() {
     app = new Application('test');
     app.lambda({ name: 'foo' })
        .s3put('/uploads/:name', null)
+       .scheduledEvent('/my-schedule', null)
   });
 
   it('passes through API gateway event', function() {
@@ -159,5 +173,13 @@ describe('LambdaEvents#standardizeEvent', function() {
 
   it('rejects DynamoDB event', function() {
     expect(events.standardizeEvent(app, DYNAMODB_UPDATE, CONTEXT)).toBeUndefined();
+  });
+  
+  it('converts scheduled event', function() {
+    expect(events.standardizeEvent(app, SCHEDULED_EVENT, CONTEXT)).toEqual({
+      method: 'SCHEDULEDEVENT',
+      stage: 'dev',
+      path: '/my-schedule'
+    });
   });
 });
