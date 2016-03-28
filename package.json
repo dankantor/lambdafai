@@ -1,10 +1,14 @@
 {
   "name": "lambdafai",
-  "version": "0.0.1",
+  "version": "0.0.3",
   "description": "TODO",
   "main": "lib/index.js",
   "author": "Clarifai, Inc.",
-  "license": "none",
+  "license": "MIT",
+  "repository" : {
+    "type": "git",
+    "url": "https://github.com/Clarifai/lambdafai.git"
+  },
   "scripts": {
     "pretest": "node_modules/jshint/bin/jshint lib",
     "test": "node_modules/jasmine/bin/jasmine.js",
