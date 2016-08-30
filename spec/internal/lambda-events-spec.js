@@ -135,6 +135,12 @@ var SCHEDULED_EVENT = {
   ]
 };
 
+var API_GATEWAY_AUTHORIZER_EVENT = {
+  "authorizationToken": "Bearer foo",
+  "methodArn": "arn:aws:execute-api:us-east-1:282244745782:1tsgzwz575/dev/GET/auth",
+  "type": "TOKEN"
+};
+
 var CONTEXT = {
   invokedFunctionArn: 'arn:aws:lambda:us-east-1:12345678:function:hello-world-hello:dev'
 }
@@ -147,6 +153,7 @@ describe('LambdaEvents#standardizeEvent', function() {
     app.lambda({ name: 'foo' })
        .s3put('/uploads/:name', null)
        .scheduledEvent('/my-schedule', null)
+       .apiGatewayAuthorizerEvent('/auth', null)
   });
 
   it('passes through API gateway event', function() {
@@ -182,4 +189,15 @@ describe('LambdaEvents#standardizeEvent', function() {
       path: '/my-schedule'
     });
   });
+  
+  it('converts api gateway authorizer event', function() {
+    expect(events.standardizeEvent(app, API_GATEWAY_AUTHORIZER_EVENT, CONTEXT)).toEqual({
+      method: 'APIGATEWAYAUTHORIZEREVENT',
+      stage: 'dev',
+      path: '/GET/auth',
+      headers: '{Authorization=Bearer foo}',
+      headerNames: '[Authorization]'
+    });
+  });
+  
 });
