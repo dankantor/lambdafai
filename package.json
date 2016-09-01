@@ -15,9 +15,9 @@
     "jsdoc": "node_modules/jsdoc/jsdoc.js -c jsdoc.json ; open docs/index.html"
   },
   "devDependencies": {
-    "jasmine": "^2.4.1",
-    "jsdoc": "^3.4.0",
-    "jshint": "^2.9.1"
+    "jasmine": "2.4.1",
+    "jsdoc": "3.4.0",
+    "jshint": "2.9.1"
   },
   "dependencies": {
     "argparse": "^1.0.6",
