@@ -38,7 +38,7 @@ describe('#handler', function() {
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({ x: 123 });
+        expect(data).toEqual({'body': {x: 123}, 'header': {} });
         testDone();
       }
     };
@@ -67,7 +67,7 @@ describe('#handler', function() {
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({ x: 123 });
+        expect(data).toEqual({'body': {x: 123}, 'header': {} });
         testDone();
       }
     };
@@ -92,7 +92,7 @@ describe('#handler', function() {
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({ x: 123 });
+        expect(data).toEqual({'body': {x: 123}, 'header': {} });
         testDone();
       }
     };
@@ -166,7 +166,7 @@ describe('#handler', function() {
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual([ 1, 2, 3, 4 ]);
+        expect(data).toEqual({'body': [ 1, 2, 3, 4 ], 'header': {} });
         testDone();
       }
     };
