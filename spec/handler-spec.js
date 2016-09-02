@@ -152,6 +152,33 @@ describe('#handler', function() {
 
     handler(app, event, context);
   });
+  
+  it('returns 302 if res.redirect is called', function(testDone) {
+    var app = new Application('test-app');
+    var lambda = app.lambda({ name: 'my-lambda' });
+
+    lambda.get('/hello', function(req, res) { 
+      res.redirect('https://example.com');
+    });
+
+    var event = {
+      stage: 'dev',
+      method: 'GET',
+      path: '/hello'
+    };
+
+    var context = {
+      done: function(err, data) {
+        expect(err.message.indexOf('HTTP 302')).toEqual(0);
+        expect(err.name.indexOf('https://example.com')).toEqual(0);
+        expect(err.details.indexOf('LambdafaiRedirect')).toEqual(0);
+        expect(data).toBeUndefined();
+        testDone();
+      }
+    };
+
+    handler(app, event, context);
+  });
 
   it('executes middleware', function(testDone) {
     var app = new Application('test-app');
