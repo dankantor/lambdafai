@@ -38,7 +38,35 @@ describe('#handler', function() {
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({ x: 123 });
+        expect(data).toEqual({'body': {x: 123}, 'header': {} });
+        testDone();
+      }
+    };
+
+    handler(app, event, context);
+  });
+  
+  it('invokes lambda with correct response headers', function(testDone) {
+    var app = new Application('my-app');
+    var lambda = app.lambda({ name: 'my-lambda' });
+
+    lambda.get('/hello/world', function(req, res) {
+      expect(req.method).toEqual('GET');
+      expect(req.path).toEqual('/hello/world');
+      res.set('Content-Type', 'text/html');
+      res.done(null, '<div>Hello, World!</div>');
+    });
+
+    var event = {
+      stage: 'dev',
+      method: 'GET',
+      path: '/hello/world'
+    };
+
+    var context = {
+      done: function(err, data) {
+        expect(err).toBeNull();
+        expect(data).toEqual({'body': '<div>Hello, World!</div>', 'header': {'Content-Type': 'text/html'} });
         testDone();
       }
     };
@@ -67,7 +95,7 @@ describe('#handler', function() {
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({ x: 123 });
+        expect(data).toEqual({'body': {x: 123}, 'header': {} });
         testDone();
       }
     };
@@ -92,7 +120,7 @@ describe('#handler', function() {
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({ x: 123 });
+        expect(data).toEqual({'body': {x: 123}, 'header': {} });
         testDone();
       }
     };
@@ -166,7 +194,7 @@ describe('#handler', function() {
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual([ 1, 2, 3, 4 ]);
+        expect(data).toEqual({'body': [ 1, 2, 3, 4 ], 'header': {} });
         testDone();
       }
     };
