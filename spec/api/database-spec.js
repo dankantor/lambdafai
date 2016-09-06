@@ -69,6 +69,63 @@ describe('Database', function() {
       expect(err).toBeNull();
       expect(result).toEqual([]);
     });
+    
+    it('lists items with an index', function() {
+      db.table('T').list({Key: {h: 'hash'}, IndexName: 'i'}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'T',
+        KeyConditionExpression: '#hashKey=:hashKey',
+        ExpressionAttributeNames: { '#hashKey': 'h' },
+        ExpressionAttributeValues: { ':hashKey': 'hash' },
+        ScanIndexForward: true,
+        Limit: 100,
+        IndexName: 'i'
+      }, jasmine.any(Function));
+
+      var items = [{ h: 'hash', r: 234, createdAt: 123, modifiedAt: 123, title: 'Hi' },
+                   { h: 'hash', r: 345, createdAt: 123, modifiedAt: 123, title: 'Bye' }];
+      invokeCallback(client.query, null, { Items: items });
+      expect(err).toBeNull();
+      expect(result).toEqual(items);
+    });
+    
+    it('lists items with ConsistentRead set to false', function() {
+      db.table('T').list({Key: {h: 'hash'}, ConsistentRead: false}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'T',
+        KeyConditionExpression: '#hashKey=:hashKey',
+        ExpressionAttributeNames: { '#hashKey': 'h' },
+        ExpressionAttributeValues: { ':hashKey': 'hash' },
+        ConsistentRead: false,
+        ScanIndexForward: true,
+        Limit: 100
+      }, jasmine.any(Function));
+
+      var items = [{ h: 'hash', r: 234, createdAt: 123, modifiedAt: 123, title: 'Hi' },
+                   { h: 'hash', r: 345, createdAt: 123, modifiedAt: 123, title: 'Bye' }];
+      invokeCallback(client.query, null, { Items: items });
+      expect(err).toBeNull();
+      expect(result).toEqual(items);
+    });
+    
+    it('lists items with ScanIndexForward set to false', function() {
+      db.table('T').list({Key: {h: 'hash'}, ScanIndexForward: false}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'T',
+        KeyConditionExpression: '#hashKey=:hashKey',
+        ExpressionAttributeNames: { '#hashKey': 'h' },
+        ExpressionAttributeValues: { ':hashKey': 'hash' },
+        ConsistentRead: true,
+        ScanIndexForward: false,
+        Limit: 100
+      }, jasmine.any(Function));
+
+      var items = [{ h: 'hash', r: 234, createdAt: 123, modifiedAt: 123, title: 'Hi' },
+                   { h: 'hash', r: 345, createdAt: 123, modifiedAt: 123, title: 'Bye' }];
+      invokeCallback(client.query, null, { Items: items });
+      expect(err).toBeNull();
+      expect(result).toEqual(items);
+    });
 
     it('error from dynamodb', function() {
       db.table('T').list({Key: {h: 'hash'}}, capture);
