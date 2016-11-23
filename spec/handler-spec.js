@@ -20,25 +20,32 @@ describe('#handler', function() {
       res.done(null, { x: 123 });
     });
 
+
+    
     var event = {
-      stage: 'dev',
-      method: 'GET',
-      path: '/hello/world',
-      headers: '{Content-Type=application/javascript, Accept=*/*, text/*}',
-      headerNames: '[Content-Type, Accept]',
-      params: '{}',
-      paramNames: '[]',
-      query: '{foo=bar}',
-      queryNames: '[foo]',
-      body: {
-        size: 'large',
+      "body": "{\"size\":\"large\"}",
+      "resource": "/hello/world",
+      "requestContext": {
+        "resourcePath": "/hello/world",
+        "httpMethod": "GET",
+        "stage": "dev"
       },
+      "queryStringParameters": {
+        "foo": "bar"
+      },
+      "headers": {
+        "Content-Type": "application/javascript",
+        "Accept": "*/*, text/*"
+      },
+      "pathParameters": null,
+      "httpMethod": "GET",
+      "path": "/hello/world"
     };
 
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({'body': {x: 123}, 'header': {} });
+        expect(data).toEqual({'statusCode': 200, 'body': JSON.stringify({x: 123}), 'headers': {} });
         testDone();
       }
     };
@@ -58,15 +65,28 @@ describe('#handler', function() {
     });
 
     var event = {
-      stage: 'dev',
-      method: 'GET',
-      path: '/hello/world'
+      "resource": "/hello/world",
+      "requestContext": {
+        "resourcePath": "/hello/world",
+        "httpMethod": "GET",
+        "stage": "dev"
+      },
+      "headers": {
+        "Content-Type": "application/javascript",
+        "Accept": "*/*, text/*"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "httpMethod": "GET",
+      "path": "/hello/world"
     };
 
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({'body': '<div>Hello, World!</div>', 'header': {'Content-Type': 'text/html'} });
+        expect(data.statusCode).toEqual(200);
+        expect(data.body).toEqual('<div>Hello, World!</div>');
+        expect(data.headers).toEqual({'Content-Type': 'text/html'});
         testDone();
       }
     };
@@ -80,22 +100,31 @@ describe('#handler', function() {
 
     lambda.get('/hello/:id', function(req, res) {
       expect(req.method).toEqual('GET');
-      expect(req.path).toEqual('/hello/:id');
+      expect(req.path).toEqual('/hello/{id}');
       res.done(null, { x: 123 });
     });
-
+    
     var event = {
-      stage: 'dev',
-      method: 'GET',
-      path: '/hello/{id}',
-      headers: '{Content-Type=application/javascript, Accept=*/*, text/*}',
-      headerNames: '[Content-Type, Accept]',
+      "resource": "/hello/{id}",
+      "requestContext": {
+        "resourcePath": "/hello/{id}",
+        "httpMethod": "GET",
+        "stage": "dev"
+      },
+      "headers": {
+        "Content-Type": "application/javascript",
+        "Accept": "*/*, text/*"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "httpMethod": "GET",
+      "path": "/hello/1"
     };
 
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({'body': {x: 123}, 'header': {} });
+        expect(data).toEqual({'statusCode': 200, 'body': JSON.stringify({x: 123}), 'headers': {} });
         testDone();
       }
     };
@@ -116,11 +145,27 @@ describe('#handler', function() {
       res.done(null, { x: 123 });
     });
 
-    var event = { stage: 'dev', method: 'POST', path: '/hello/world' };
+    var event = {
+      "resource": "/hello/world",
+      "requestContext": {
+        "resourcePath": "/hello/world",
+        "httpMethod": "POST",
+        "stage": "dev"
+      },
+      "headers": {
+        "Content-Type": "application/javascript",
+        "Accept": "*/*, text/*"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "httpMethod": "POST",
+      "path": "/hello/world"
+    };
+    
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({'body': {x: 123}, 'header': {} });
+        expect(data).toEqual({'statusCode': 200, 'body': JSON.stringify({x: 123}), 'headers': {} });
         testDone();
       }
     };
@@ -133,19 +178,28 @@ describe('#handler', function() {
     var lambda = app.lambda({ name: 'my-lambda' });
 
     lambda.get('/hello', function(req, res) { res.done(null, {}); });
-
+    
     var event = {
-      stage: 'dev',
-      method: 'GET',
-      path: '/hello/world',
-      headers: '{Content-Type=application/javascript, Accept=*/*, text/*}',
-      headerNames: '[Content-Type, Accept]',
+      "resource": "/hello/world",
+      "requestContext": {
+        "resourcePath": "/hello/world",
+        "httpMethod": "GET",
+        "stage": "dev"
+      },
+      "headers": {
+        "Content-Type": "application/javascript",
+        "Accept": "*/*, text/*"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "httpMethod": "GET",
+      "path": "/hello/world"
     };
 
     var context = {
       done: function(err, data) {
-        expect(err.message.indexOf('HTTP 404')).toEqual(0);
-        expect(data).toBeUndefined();
+        expect(data.statusCode).toEqual(404);
+        expect(data.body).toBeUndefined();
         testDone();
       }
     };
@@ -162,17 +216,27 @@ describe('#handler', function() {
     });
 
     var event = {
-      stage: 'dev',
-      method: 'GET',
-      path: '/hello'
+      "resource": "/hello",
+      "requestContext": {
+        "resourcePath": "/hello",
+        "httpMethod": "GET",
+        "stage": "dev"
+      },
+      "headers": {
+        "Content-Type": "application/javascript",
+        "Accept": "*/*, text/*"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "httpMethod": "GET",
+      "path": "/hello"
     };
 
     var context = {
       done: function(err, data) {
-        expect(err.message.indexOf('HTTP 302')).toEqual(0);
-        expect(err.name.indexOf('https://example.com')).toEqual(0);
-        expect(err.details.indexOf('LambdafaiRedirect')).toEqual(0);
-        expect(data).toBeUndefined();
+        expect(data.statusCode).toEqual(302);
+        expect(data.headers.location).toEqual('https://example.com');
+        expect(data.body).toBeUndefined();
         testDone();
       }
     };
@@ -217,11 +281,27 @@ describe('#handler', function() {
       res.next();
     });
 
-    var event = { stage: 'dev', method: 'GET', path: '/hello' };
+    var event = {
+      "resource": "/hello",
+      "requestContext": {
+        "resourcePath": "/hello",
+        "httpMethod": "GET",
+        "stage": "dev"
+      },
+      "headers": {
+        "Content-Type": "application/javascript",
+        "Accept": "*/*, text/*"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "httpMethod": "GET",
+      "path": "/hello"
+    };
+    
     var context = {
       done: function(err, data) {
         expect(err).toBeNull();
-        expect(data).toEqual({'body': [ 1, 2, 3, 4 ], 'header': {} });
+        expect(data).toEqual({ 'statusCode': 200, 'body': JSON.stringify([ 1, 2, 3, 4 ]), 'headers': {} });
         testDone();
       }
     };

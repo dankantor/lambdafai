@@ -151,7 +151,7 @@ describe('Database', function() {
     it('not found item', function() {
       db.table('T').get({Key: {h: 'hash', r: 123}}, capture);
       invokeCallback(client.get, null, {});
-      expect(err.status).toEqual(404);
+      expect(err.statusCode).toEqual(404);
       expect(result).toBeUndefined();
     });
 
@@ -195,7 +195,7 @@ describe('Database', function() {
           'T': { Keys: [ { h: 'sash', r: 456 } ], }
         }
       });
-      expect(err.status).toEqual(500);
+      expect(err.statusCode).toEqual(500);
       expect(result).toBeUndefined();
     });
 
@@ -255,7 +255,7 @@ describe('Database', function() {
       var e = new Error('Failed');
       e.name = 'ConditionalCheckFailedException';
       invokeCallback(client.put, e);
-      expect(err.status).toBe(409);
+      expect(err.statusCode).toBe(409);
       expect(result).toBeUndefined();
     });
 
@@ -305,7 +305,7 @@ describe('Database', function() {
       var e = new Error('Failed');
       e.name = 'ConditionalCheckFailedException';
       invokeCallback(client.update, e);
-      expect(err.status).toEqual(404);
+      expect(err.statusCode).toEqual(404);
     });
 
     it('handles dynamodb error', function() {
@@ -338,7 +338,7 @@ describe('Database', function() {
       var e = new Error('Failed');
       e.name = 'ConditionalCheckFailedException';
       invokeCallback(client.update, e);
-      expect(err.status).toEqual(404);
+      expect(err.statusCode).toEqual(404);
     });
 
     it('handles dynamodb error', function() {
@@ -410,7 +410,7 @@ describe('Database', function() {
       db.acl('A').check({User: 'u', Resource: 'album:abc', Permissions: ['r', 'w']},
         capture);
       invokeCallback(client.get, null, {Item: { userID: 'user123', res: 'album:abc', r: 1 }});
-      expect(err.status).toEqual(403);
+      expect(err.statusCode).toEqual(403);
     });
 
     it("handles dynamodb error", function() {
@@ -529,8 +529,8 @@ describe('Database', function() {
           'A':  [{ DeleteRequest: { Key: { userID: 'user123', res: 'album:abc' }}}]
         }
       });
-      expect(err.status).toEqual(500);
-      expect(err.message).toContain('Unprocessed Items');
+      expect(err.statusCode).toEqual(500);
+      expect(err.body).toContain('Unprocessed Items');
     });
   });
 
