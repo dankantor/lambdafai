@@ -1,0 +1,9 @@
+{
+  "name": "lambdafai-api-gateway-examples",
+  "version": "0.0.1",
+  "author": "Clarifai, Inc.",
+  "license": "none",
+  "dependencies": {
+    "lambdafai": "https://github.com/clarifai/lambdafai.git"
+  }
+}
