@@ -243,6 +243,43 @@ describe('#handler', function() {
 
     handler(app, event, context);
   });
+  
+  it('sets arbitrary status codes', function(testDone) {
+    var app = new Application('test-app');
+    var lambda = app.lambda({ name: 'my-lambda' });
+
+    lambda.get('/hello', function(req, res) { 
+      res.statusCode = 201;
+      res.send({'abc': 123});
+    });
+
+    var event = {
+      "resource": "/hello",
+      "requestContext": {
+        "resourcePath": "/hello",
+        "httpMethod": "GET",
+        "stage": "dev"
+      },
+      "headers": {
+        "Content-Type": "application/javascript",
+        "Accept": "*/*, text/*"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "httpMethod": "GET",
+      "path": "/hello"
+    };
+
+    var context = {
+      done: function(err, data) {
+        expect(data.statusCode).toEqual(201);
+        expect(data.body).toBe('{"abc":123}');
+        testDone();
+      }
+    };
+
+    handler(app, event, context);
+  });
 
   it('executes middleware', function(testDone) {
     var app = new Application('test-app');
