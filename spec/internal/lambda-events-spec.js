@@ -342,7 +342,6 @@ describe('LambdaEvents#standardizeEvent', function() {
   });
   
   it('converts DynamoDB Insert event', function() {
-    console.log(events.standardizeEvent(app, DYNAMODB_INSERT, CONTEXT));
     expect(events.standardizeEvent(app, DYNAMODB_INSERT, CONTEXT)).toEqual({
       "method": "DYNAMODBINSERT",
       "stage": "dev",
