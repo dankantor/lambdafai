@@ -79,7 +79,7 @@ var S3_DELETE = {
   ]
 };
 
-var DYNAMODB_UPDATE = {
+var DYNAMODB_INSERT = {
   "Records": [
     {
       "eventID": "1",
@@ -298,10 +298,6 @@ describe('LambdaEvents#standardizeEvent', function() {
   it('rejects s3 delete event', function() {
     expect(events.standardizeEvent(app, S3_DELETE, CONTEXT)).toBeUndefined();
   });
-
-  it('rejects DynamoDB event', function() {
-    expect(events.standardizeEvent(app, DYNAMODB_UPDATE, CONTEXT)).toBeUndefined();
-  });
   
   it('converts scheduled event', function() {
     expect(events.standardizeEvent(app, SCHEDULED_EVENT, CONTEXT)).toEqual({
@@ -345,4 +341,30 @@ describe('LambdaEvents#standardizeEvent', function() {
     });
   });
   
+  it('converts DynamoDB Insert event', function() {
+    console.log(events.standardizeEvent(app, DYNAMODB_INSERT, CONTEXT));
+    expect(events.standardizeEvent(app, DYNAMODB_INSERT, CONTEXT)).toEqual({
+      "method": "DYNAMODBINSERT",
+      "stage": "dev",
+      "path": "/T",
+      "body": {
+        "Keys": {
+          "Id": {
+          "N": "101"
+        }
+      },
+      "NewImage": {
+        "Message": {
+          "S": "New item!"
+        },
+        "Id": {
+          "N": "101"
+        }
+      },
+      "StreamViewType": "NEW_AND_OLD_IMAGES",
+      "SequenceNumber": "111",
+      "SizeBytes": 26
+    } 
+    });
+  });
 });
