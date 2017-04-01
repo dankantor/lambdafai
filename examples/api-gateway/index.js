@@ -26,12 +26,7 @@ lambdafai('lambdafai-api-gateway-examples', function(app) {
   });
   
   // handle CORS OPTIONS request
-  hello.options('/foo', function(req, res) {
-    res.set('Access-Control-Allow-Headers', 'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token');
-    res.set('Access-Control-Allow-Methods', 'GET,PUT,POST,DELETE,OPTIONS');
-    res.set('Access-Control-Allow-Origin', '*');
-    res.send();
-  });
+  hello.options('/foo', null, {'type': 'MOCK'});
   
   // Set routes to use Cognito User Pools as a custom authorizer
   hello.get('/me', function(req, res) {
