@@ -26,7 +26,12 @@ lambdafai('lambdafai-api-gateway-examples', function(app) {
   });
   
   // handle CORS OPTIONS request
-  hello.options('/foo', null, {'type': 'MOCK'});
+  app.lambda({ name: 'lambda' })
+    .get('/index', function(req, res) {
+      res.send({
+        'ok': true
+      });
+    }, {'cors': true});
   
   // Set routes to use Cognito User Pools as a custom authorizer
   hello.get('/me', function(req, res) {
