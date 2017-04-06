@@ -16,30 +16,37 @@ describe('#handler', function() {
       });
       expect(req.params).toEqual({});
       expect(req.query).toEqual({foo: 'bar'});
-      expect(req.body).toEqual({ size: 'large' });
       res.done(null, { x: 123 });
     });
 
-
     
     var event = {
-      "body": "{\"size\":\"large\"}",
       "resource": "/hello/world",
-      "requestContext": {
-        "resourcePath": "/hello/world",
-        "httpMethod": "GET",
-        "stage": "dev"
-      },
-      "queryStringParameters": {
-        "foo": "bar"
-      },
+      "path": "/hello/world",
+      "httpMethod": "GET",
+      "method": "GET",
       "headers": {
         "Content-Type": "application/javascript",
         "Accept": "*/*, text/*"
       },
+      "queryStringParameters": {
+        "foo": "bar"
+      },
       "pathParameters": null,
-      "httpMethod": "GET",
-      "path": "/hello/world"
+      "stageVariables": {
+        "stage": "dev"
+      },
+      "requestContext": {
+        "accountId": "123456",
+        "resourceId": "18c197",
+        "stage": "dev",
+        "requestId": "cac86544-d2f5-11e6-b8f4-51d739c0e1d3",
+        "resourcePath": "users",
+        "httpMethod": "GET",
+        "apiId": "123456"
+      },
+      "body": null,
+      "isBase64Encoded": false
     };
 
     var context = {
@@ -339,6 +346,104 @@ describe('#handler', function() {
       done: function(err, data) {
         expect(err).toBeNull();
         expect(data).toEqual({ 'statusCode': 200, 'body': JSON.stringify([ 1, 2, 3, 4 ]), 'headers': {} });
+        testDone();
+      }
+    };
+
+    handler(app, event, context);
+  });
+  
+  it('converts JSON POST data to body params', function(testDone) {
+    var app = new Application('test-app');
+    var lambda = app.lambda({ name: 'my-lambda' });
+
+    lambda.post('/hello', function(req, res) { 
+      res.statusCode = 200;
+      var a = req.body.a;
+      var b = req.body.b;
+      expect(a).toEqual(1);
+      expect(b).toEqual(2);
+      res.send({'a': a, 'b': b});
+    });
+
+    var event = {
+      "resource": "/hello",
+      "path": "/hello",
+      "httpMethod": "POST",
+      "method": "POST",
+      "headers": {
+        "content-type": "application/json"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "stageVariables": {
+        "stage": "dev"
+      },
+      "requestContext": {
+        "accountId": "123456",
+        "resourceId": "18c197",
+        "stage": "dev",
+        "requestId": "cac86544-d2f5-11e6-b8f4-51d739c0e1d3",
+        "resourcePath": "users",
+        "httpMethod": "POST",
+        "apiId": "123456"
+      },
+      "body": '{"a": 1,"b": 2}',
+      "isBase64Encoded": false
+    };
+
+    var context = {
+      done: function(err, data) {
+        expect(data.body).toBe('{"a":1,"b":2}');
+        testDone();
+      }
+    };
+
+    handler(app, event, context);
+  });
+  
+  it('converts form POST data to body params', function(testDone) {
+    var app = new Application('test-app');
+    var lambda = app.lambda({ name: 'my-lambda' });
+
+    lambda.post('/hello', function(req, res) { 
+      res.statusCode = 200;
+      var a = req.body.a;
+      var b = req.body.b;
+      expect(a).toEqual('1');
+      expect(b).toEqual('2');
+      res.send({'a': a, 'b': b});
+    });
+
+    var event = {
+      "resource": "/hello",
+      "path": "/hello",
+      "httpMethod": "POST",
+      "method": "POST",
+      "headers": {
+        "content-type": "application/x-www-form-urlencoded"
+      },
+      "queryStringParameters": null,
+      "pathParameters": null,
+      "stageVariables": {
+        "stage": "dev"
+      },
+      "requestContext": {
+        "accountId": "123456",
+        "resourceId": "18c197",
+        "stage": "dev",
+        "requestId": "cac86544-d2f5-11e6-b8f4-51d739c0e1d3",
+        "resourcePath": "users",
+        "httpMethod": "POST",
+        "apiId": "123456"
+      },
+      "body": "a=1&b=2",
+      "isBase64Encoded": false
+    };
+
+    var context = {
+      done: function(err, data) {
+        expect(data.body).toBe('{"a":"1","b":"2"}');
         testDone();
       }
     };
