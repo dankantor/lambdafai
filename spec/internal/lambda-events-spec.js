@@ -204,6 +204,14 @@ var COGNITO_EVENT = {
   "response": {}
 };
 
+var INVOKE_EVENT = {
+  "method": "Invoke",
+  "path": "/hello",
+  "body": {
+    "foo": "bar"
+  }
+};
+
 var CONTEXT = {
   invokedFunctionArn: 'arn:aws:lambda:us-east-1:12345678:function:hello-world-hello:dev'
 }
@@ -351,19 +359,31 @@ describe('LambdaEvents#standardizeEvent', function() {
           "Id": {
           "N": "101"
         }
-      },
-      "NewImage": {
-        "Message": {
-          "S": "New item!"
         },
-        "Id": {
-          "N": "101"
-        }
-      },
-      "StreamViewType": "NEW_AND_OLD_IMAGES",
-      "SequenceNumber": "111",
-      "SizeBytes": 26
-    } 
+        "NewImage": {
+          "Message": {
+            "S": "New item!"
+          },
+          "Id": {
+            "N": "101"
+          }
+        },
+        "StreamViewType": "NEW_AND_OLD_IMAGES",
+        "SequenceNumber": "111",
+        "SizeBytes": 26
+      } 
     });
   });
+  
+  it('converts invoke event', function() {
+    expect(events.standardizeEvent(app, INVOKE_EVENT, CONTEXT)).toEqual({
+      method: 'INVOKE',
+      stage: 'dev',
+      path: '/hello',
+      body: { 
+        'foo': 'bar',
+      }
+    });
+  });
+  
 });
