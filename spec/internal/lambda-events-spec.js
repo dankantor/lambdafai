@@ -206,7 +206,13 @@ var COGNITO_EVENT = {
 
 var CONTEXT = {
   invokedFunctionArn: 'arn:aws:lambda:us-east-1:12345678:function:hello-world-hello:dev'
-}
+};
+
+var CLOUDWATCH_LOGS_EVENT = {
+  "awslogs": {
+    "data": "H4sIAAAAAAAAAHWPwQqCQBCGX0Xm7EFtK+smZBEUgXoLCdMhFtKV3akI8d0bLYmibvPPN3wz00CJxmQnTO41whwWQRIctmEcB6sQbFC3CjW3XW8kxpOpP+OC22d1Wml1qZkQGtoMsScxaczKN3plG8zlaHIta5KqWsozoTYw3/djzwhpLwivWFGHGpAFe7DL68JlBUk+l7KSN7tCOEJ4M3/qOI49vMHj+zCKdlFqLaU2ZHV2a4Ct/an0/ivdX8oYc1UVX860fQDQiMdxRQEAAA=="
+  }
+};
 
 describe('LambdaEvents#standardizeEvent', function() {
   var app;
@@ -358,18 +364,48 @@ describe('LambdaEvents#standardizeEvent', function() {
           "N": "101"
         }
       },
-      "NewImage": {
-        "Message": {
-          "S": "New item!"
+        "NewImage": {
+          "Message": {
+            "S": "New item!"
+          },
+          "Id": {
+            "N": "101"
+          }
         },
-        "Id": {
-          "N": "101"
-        }
-      },
-      "StreamViewType": "NEW_AND_OLD_IMAGES",
-      "SequenceNumber": "111",
-      "SizeBytes": 26
-    } 
+        "StreamViewType": "NEW_AND_OLD_IMAGES",
+        "SequenceNumber": "111",
+        "SizeBytes": 26
+      } 
     });
   });
+  
+  it('converts Cloudwatch Logs event', function() {
+    expect(events.standardizeEvent(app, CLOUDWATCH_LOGS_EVENT, CONTEXT)).toEqual({
+      "method": "CLOUDWATCHLOGS",
+      "stage": "dev",
+      "path": "/testFilter",
+      "body": {
+        "messageType": "DATA_MESSAGE",
+        "owner": "123456789123",
+        "logGroup": "testLogGroup",
+        "logStream": "testLogStream",
+        "subscriptionFilters": [
+          "testFilter"
+        ],
+        "logEvents": [
+          {
+            "id": "eventId1",
+            "timestamp": 1440442987000,
+            "message": "[ERROR] First test message"
+          },
+          {
+            "id": "eventId2",
+            "timestamp": 1440442987001,
+            "message": "[ERROR] Second test message"
+          }
+        ]
+      } 
+    });
+  });
+  
 });
