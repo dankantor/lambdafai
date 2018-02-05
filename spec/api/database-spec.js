@@ -126,6 +126,45 @@ describe('Database', function() {
       expect(err).toBeNull();
       expect(result).toEqual(items);
     });
+    
+    it('lists items and returns full result', function() {
+      db.table('T').list({Key: {h: 'hash'}, FullResult: true}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'T',
+        KeyConditionExpression: '#hashKey=:hashKey',
+        ExpressionAttributeNames: { '#hashKey': 'h' },
+        ExpressionAttributeValues: { ':hashKey': 'hash' },
+        ConsistentRead: true,
+        ScanIndexForward: true,
+        Limit: 100
+      }, jasmine.any(Function));
+
+      var items = [{ h: 'hash', r: 234, createdAt: 123, modifiedAt: 123, title: 'Hi' },
+                   { h: 'hash', r: 345, createdAt: 123, modifiedAt: 123, title: 'Bye' }];
+      invokeCallback(client.query, null, { Items: items, Count: 2 });
+      expect(err).toBeNull();
+      expect(result).toEqual({ Items: items, Count: 2 });
+    });
+    
+    it('lists items with an ExlusiveStartKey', function() {
+      db.table('T').list({Key: {h: 'hash'}, ExclusiveStartKey: { Foo: 'Bar' }}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'T',
+        KeyConditionExpression: '#hashKey=:hashKey',
+        ExpressionAttributeNames: { '#hashKey': 'h' },
+        ExpressionAttributeValues: { ':hashKey': 'hash' },
+        ConsistentRead: true,
+        ScanIndexForward: true,
+        Limit: 100,
+        ExclusiveStartKey: { Foo: 'Bar' }
+      }, jasmine.any(Function));
+
+      var items = [{ h: 'hash', r: 234, createdAt: 123, modifiedAt: 123, title: 'Hi' },
+                   { h: 'hash', r: 345, createdAt: 123, modifiedAt: 123, title: 'Bye' }];
+      invokeCallback(client.query, null, { Items: items });
+      expect(err).toBeNull();
+      expect(result).toEqual(items);
+    });
 
     it('error from dynamodb', function() {
       db.table('T').list({Key: {h: 'hash'}}, capture);
