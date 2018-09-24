@@ -165,6 +165,26 @@ describe('Database', function() {
       expect(err).toBeNull();
       expect(result).toEqual(items);
     });
+    
+    it('lists items with a given ProjectionExpression', function() {
+      db.table('T').list({Key: {h: 'hash'}, ProjectionExpression: ['r', 'title']}, capture);
+      expect(client.query).toHaveBeenCalledWith({
+        TableName: 'T',
+        KeyConditionExpression: '#hashKey=:hashKey',
+        ExpressionAttributeNames: { '#hashKey': 'h', '#pe0': 'r', '#pe1': 'title' },
+        ExpressionAttributeValues: { ':hashKey': 'hash' },
+        ConsistentRead: true,
+        ScanIndexForward: true,
+        Limit: 100,
+        ProjectionExpression: '#pe0,#pe1'
+      }, jasmine.any(Function));
+
+      var items = [{ h: 'hash', r: 234, createdAt: 123, modifiedAt: 123, title: 'Hi' },
+                   { h: 'hash', r: 345, createdAt: 123, modifiedAt: 123, title: 'Bye' }];
+      invokeCallback(client.query, null, { Items: items });
+      expect(err).toBeNull();
+      expect(result).toEqual(items);
+    });
 
     it('error from dynamodb', function() {
       db.table('T').list({Key: {h: 'hash'}}, capture);
@@ -206,6 +226,22 @@ describe('Database', function() {
       invokeCallback(client.get, new Error('Failed'));
       expect(err.message).toEqual('Failed');
     });
+    
+    it('item with ProjectionExpression', function() {
+      db.table('T').get({Key: {h: 'hash', r: 123}, ProjectionExpression: ['r', 'title']}, capture);
+      expect(client.get).toHaveBeenCalledWith({
+        TableName: 'T',
+        Key: {h: 'hash', r: 123},
+        ExpressionAttributeNames: { '#pe0': 'r', '#pe1': 'title' },
+        ProjectionExpression: '#pe0,#pe1'
+      }, jasmine.any(Function));
+
+      var item = { h: 'hash', r: 123, createdAt: 1234567890, title: 'Hi', x: 2 };
+      invokeCallback(client.get, null, { Item: item });
+      expect(err).toBeNull();
+      expect(result).toEqual(item);
+    });
+    
   });
 
   describe("#batchGet", function() {
@@ -243,6 +279,28 @@ describe('Database', function() {
       invokeCallback(client.batchGet, new Error('Failed'));
       expect(err.message).toEqual('Failed');
     });
+    
+    it("gets items with ProjectionExpression", function() {
+      db.table('T').batchGet({
+        Keys: [{h: 'hash', r: 123}, {h: 'sash', r: 456}], 
+        ProjectionExpression: ['r', 'title']
+      }, capture);
+      expect(client.batchGet).toHaveBeenCalledWith({
+        RequestItems: { 
+          'T': { 
+            Keys: [{h: 'hash', r: 123}, {h: 'sash', r: 456}],
+            ProjectionExpression: ['#pe0', '#pe1'],
+            ExpressionAttributeNames: {'#pe0': 'r', '#pe1': 'title'}
+          }
+        }
+      }, jasmine.any(Function));
+      var items = [{ h: 'hash', r: 123, createdAt: 111, modifiedAt: 222, title: 'Hi' },
+                   { h: 'sash', r: 456, createdAt: 333, modifiedAt: 444, title: 'Bye' }];
+      invokeCallback(client.batchGet, null, { Responses: { 'T': items } });
+      expect(err).toBeNull();
+      expect(result).toEqual(items);
+    });
+    
   });
 
   describe('#put', function() {
