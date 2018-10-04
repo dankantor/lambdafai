@@ -222,6 +222,14 @@ var KINESIS_FIREHOSE_EVENT = {
   ]
 };
 
+var INVOKE_EVENT = {
+  "method": "lambdaInvoke",
+  "path": "/hello",
+  "body": {
+    "foo": "bar"
+  }
+};
+
 
 describe('LambdaEvents#standardizeEvent', function() {
   var app;
@@ -426,4 +434,15 @@ describe('LambdaEvents#standardizeEvent', function() {
     });
   });
   
+  it('converts invoke event', function() {
+    expect(events.standardizeEvent(app, INVOKE_EVENT, CONTEXT)).toEqual({
+      method: 'LAMBDAINVOKE',
+      stage: 'dev',
+      path: '/hello',
+      body: { 
+        'foo': 'bar',
+      }
+    });
+  });
+    
 });
