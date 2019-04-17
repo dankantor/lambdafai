@@ -230,6 +230,27 @@ var INVOKE_EVENT = {
   }
 };
 
+var SQS_EVENT = {
+  "Records": [
+    {
+      "messageId": "cc47531f-ffb9-4fb0-a10f-faaa320bf844",
+      "receiptHandle": "AQEBfct+q3dSQwptWb65AFcg7ifnN8A//HvAfhOAh7CLhNQjkvgbHBRu7szleFEcI7/fnVAgFhwC86hfsa8rwDpkOBKUP8pq8Tate0nsgU6LGPT+DuxkhS1HUHomcg4kyJ8ZGD1b6pdGPPTUcasEf+eVvgwaT76dYjb1Sz0FGYD9rptUy1oXxEGU+hBW8nMTk3nxjYaAEYm14FlrKoeJ+PDJjEzPfJEsXRECBWR9akNUfBQ6Z7i+7Pxmm5CthhsbSWibbPOVO0VvVFYo9EuWdIuZDiFaUVnzCuBXy17WINjvhbTKdjd269JVf4WATLzc7fcMOotA02Z3vfbZOUTCQYXEM1oud4fJQQr5KX1q9jjVXWCg1QjMlhCSNtDGN268umcV",
+    "body": "{\n              \"name\": \"Banana Pancakes\",\n              \"artist\": \"Jack Johnson\",\n              \"timestamp\": 1555452830273,\n              \"album\": \"In Between Dreams\",\n              \"username\": \"henry\" \n            }",
+      "attributes": {
+          "ApproximateReceiveCount": "1",
+          "SentTimestamp": "1555525363318",
+          "SenderId": "AIDAIB3UT6ZYNBK6GRUN6",
+          "ApproximateFirstReceiveTimestamp": "1555525363321"
+      },
+      "messageAttributes": {},
+      "md5OfBody": "4ed001b09ed657aa808fc83dcafb2686",
+      "eventSource": "aws:sqs",
+      "eventSourceARN": "arn:aws:sqs:us-east-1:394977031522:music-dev-Favs",
+      "awsRegion": "us-east-1"
+    }
+  ]
+}
+
 
 describe('LambdaEvents#standardizeEvent', function() {
   var app;
@@ -442,6 +463,15 @@ describe('LambdaEvents#standardizeEvent', function() {
       body: { 
         'foo': 'bar',
       }
+    });
+  });
+  
+  it('converts sqs event', function() {
+    expect(events.standardizeEvent(app, SQS_EVENT, CONTEXT)).toEqual({
+      method: 'SQS',
+      stage: 'dev',
+      path: '/Favs',
+      body: ["{\n              \"name\": \"Banana Pancakes\",\n              \"artist\": \"Jack Johnson\",\n              \"timestamp\": 1555452830273,\n              \"album\": \"In Between Dreams\",\n              \"username\": \"henry\" \n            }"]
     });
   });
     
