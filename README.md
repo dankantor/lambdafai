@@ -29,6 +29,11 @@ node index.js create-resources dev
 node index.js invoke dev '{path: "/hello"}'
 ```
 
+#### Local Development
+```
+node index.js local-server dev
+```
+
 #### Deploy
 ```
 node index.js deploy dev
